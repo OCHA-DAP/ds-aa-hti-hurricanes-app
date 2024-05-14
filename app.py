@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import Dash, html
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-app.title = "Tropical Cyclones Return Period"
+app.title = "Cadre action anticipatoire ouragans Haïti : déclencheurs historiques"
 app._favicon = "assets/favicon.ico"
 server = app.server
 
@@ -13,14 +13,14 @@ navbar = dbc.NavbarSimple(
                 html.Img(src="assets/centre_banner_greenbg.png", height=40),
                 href="https://centre.humdata.org/anticipatory-action/",
             ),
-            className="ml-2",
         ),
     ],
-    style={"height": "60px", "margin": "0px"},
-    brand="Tropical Cyclones Return Period Analysis",
+    style={"height": "60px", "margin": "0px", "padding": "10px"},
+    brand="Cadre action anticipatoire ouragans Haïti : déclencheurs historiques",
     fixed="top",
     color="primary",
     dark=True,
+    fluid=True,
 )
 
 app.layout = html.Div([navbar])
