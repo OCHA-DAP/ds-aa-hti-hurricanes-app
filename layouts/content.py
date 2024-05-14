@@ -1,11 +1,17 @@
-from dash import dcc
+from dash import dcc, html
 
-content = dcc.Loading(
-    dcc.Graph(
-        # figure=init_fig,
-        id="graph-content",
-        style={"height": "100vh", "background-color": "#f8f9fc"},
-        config={"displayModeBar": False},
+from components.map_plot import map_plot
+
+content = html.Div(
+    style={
+        "position": "fixed",
+        "top": 60,
+        "left": 0,
+        "width": "100%",
+        "zIndex": 0,
+    },
+    children=dcc.Loading(
+        map_plot,
+        parent_className="loading_wrapper",
     ),
-    parent_className="loading_wrapper",
 )
