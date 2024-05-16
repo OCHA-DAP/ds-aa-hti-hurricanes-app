@@ -41,7 +41,7 @@ lts = {
     "obsv": pd.Timedelta(days=0),
 }
 
-adm = codab.load_codab(admin_level=0)
+adm = codab.load_codab_from_blob(admin_level=0)
 buffer = codab.load_buffer(distance_km=230)
 
 
