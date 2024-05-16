@@ -9,7 +9,7 @@ def load_hist_fcast_monitors():
     return pd.read_parquet(
         BytesIO(
             blob.load_blob_data(
-                "ds-aa-hti-hurricanes/procesed/monitors.parquet",
+                "ds-aa-hti-hurricanes/processed/monitors.parquet",
                 prod_dev="dev",
             )
         )

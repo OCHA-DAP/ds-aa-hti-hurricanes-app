@@ -1,9 +1,11 @@
+import json
+
 import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc
 
 from src.constants import MATTHEW_ATCF_ID
-from src.datasources import nhc
+from src.datasources import codab, nhc
 
 
 def speed2cat(speed):
@@ -39,10 +41,36 @@ lts = {
     "obsv": pd.Timedelta(days=0),
 }
 
+adm = codab.load_codab(admin_level=0)
+buffer = codab.load_buffer(distance_km=230)
+
 
 def plot_forecast_map(atcf_id):
     tracks_f = tracks[tracks["atcf_id"] == atcf_id]
     fig = go.Figure()
+    for geom in adm.geometry[0].geoms:
+        x, y = geom.exterior.coords.xy
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=list(x),
+                lat=list(y),
+                mode="lines",
+                line_color="red",
+                showlegend=False,
+            )
+        )
+    fig.add_trace(
+        go.Choroplethmapbox(
+            geojson=json.loads(buffer.geometry.to_json()),
+            locations=buffer.index,
+            z=[1],
+            colorscale="Reds",
+            marker_opacity=0.2,
+            showscale=False,
+            marker_line_width=0,
+            hoverinfo="none",
+        )
+    )
     visible = True
     for issue_time, group in tracks_f.groupby("issue_time"):
         issue_time_str = issue_time.strftime("%-d %b, %H:%M")
