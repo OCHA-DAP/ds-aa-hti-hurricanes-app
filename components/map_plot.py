@@ -4,7 +4,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc
 
-from src.constants import MATTHEW_ATCF_ID
 from src.datasources import codab, nhc
 
 
@@ -45,7 +44,7 @@ adm = codab.load_codab_from_blob(admin_level=0)
 buffer = codab.load_buffer(distance_km=230)
 
 
-def plot_forecast_map(atcf_id):
+def map_plot_fig(atcf_id):
     tracks_f = tracks[tracks["atcf_id"] == atcf_id]
     fig = go.Figure()
     for geom in adm.geometry[0].geoms:
@@ -135,8 +134,7 @@ def plot_forecast_map(atcf_id):
 
 
 map_plot = dcc.Graph(
-    figure=plot_forecast_map(MATTHEW_ATCF_ID),
-    id="map-content",
+    id="map-plot",
     style={"height": "100vh", "background-color": "#f8f9fc"},
     config={"displayModeBar": False},
 )

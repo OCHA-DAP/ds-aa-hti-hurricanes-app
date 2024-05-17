@@ -30,3 +30,7 @@
 .rc-slider-handle-active:active {
   border-color: #1bb580ff;
 }
+
+.bold-option .dropdown-item {
+    font-weight: bold;
+}
