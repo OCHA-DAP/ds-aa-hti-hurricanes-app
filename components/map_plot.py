@@ -44,8 +44,12 @@ adm = codab.load_codab_from_blob(admin_level=0)
 buffer = codab.load_buffer(distance_km=230)
 
 
-def map_plot_fig(atcf_id):
-    tracks_f = tracks[tracks["atcf_id"] == atcf_id]
+def map_plot_fig(atcf_id: str, issue_time):
+    tracks_f = tracks[
+        (tracks["atcf_id"] == atcf_id)
+        & (tracks["issue_time"].astype(str) == issue_time)
+    ]
+    issue_time_str = pd.to_datetime(issue_time).strftime("%Hh, %d %b")
     fig = go.Figure()
     for geom in adm.geometry[0].geoms:
         x, y = geom.exterior.coords.xy
@@ -70,58 +74,45 @@ def map_plot_fig(atcf_id):
             hoverinfo="none",
         )
     )
-    visible = True
-    for issue_time, group in tracks_f.groupby("issue_time"):
-        issue_time_str = issue_time.strftime("%-d %b, %H:%M")
-        dff_a = group[group["lt"] <= lts["action"]]
-        dff_r = group[
-            (group["lt"] <= lts["readiness"]) & (group["lt"] >= lts["action"])
-        ]
-        fig.add_trace(
-            go.Scattermapbox(
-                lon=dff_a["lon"],
-                lat=dff_a["lat"],
-                mode="text+lines",
-                text=dff_a["windspeed"].astype(str),
-                name=issue_time_str,
-                legendgroup=issue_time_str,
-                line=dict(width=2, color="black"),
-                textfont=dict(size=20, color="black"),
-                visible=visible,
-                showlegend=True,
-                # legendgrouptitle_text=issue_time_str,
-            )
+
+    dff_a = tracks_f[tracks_f["lt"] <= lts["action"]]
+    dff_r = tracks_f[
+        (tracks_f["lt"] <= lts["readiness"]) & (tracks_f["lt"] >= lts["action"])
+    ]
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=dff_a["lon"],
+            lat=dff_a["lat"],
+            mode="text+lines",
+            text=dff_a["windspeed"].astype(str),
+            name="Prévision normale",
+            line=dict(width=2, color="black"),
+            textfont=dict(size=20, color="black"),
         )
-        fig.add_trace(
-            go.Scattermapbox(
-                lon=dff_r["lon"],
-                lat=dff_r["lat"],
-                mode="text+lines",
-                text=dff_a["windspeed"].astype(str),
-                name=issue_time_str,
-                legendgroup=issue_time_str,
-                line=dict(width=2, color="grey"),
-                textfont=dict(size=20, color="grey"),
-                visible=visible,
-                showlegend=False,
-                legendgrouptitle_text="",
-            )
+    )
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=dff_r["lon"],
+            lat=dff_r["lat"],
+            mode="text+lines",
+            text=dff_a["windspeed"].astype(str),
+            name="Prévision prolongée",
+            legendgroup=issue_time_str,
+            line=dict(width=2, color="grey"),
+            textfont=dict(size=20, color="grey"),
         )
-        fig.add_trace(
-            go.Scattermapbox(
-                lon=[-72.3],
-                lat=[19],
-                mode="text",
-                text=[f'{dff_r["roll2_rain_dist"].max():.0f}'],
-                name=issue_time_str,
-                legendgroup=issue_time_str,
-                textfont=dict(size=20, color="blue"),
-                visible=visible,
-                showlegend=False,
-                legendgrouptitle_text="",
-            )
+    )
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=[-72.3],
+            lat=[19],
+            mode="text",
+            text=[f'{dff_r["roll2_rain_dist"].max():.0f}'],
+            name=issue_time_str,
+            legendgroup=issue_time_str,
+            textfont=dict(size=20, color="blue"),
         )
-        visible = "legendonly"
+    )
 
     fig.update_layout(
         mapbox_style="open-street-map",
@@ -129,6 +120,7 @@ def map_plot_fig(atcf_id):
         mapbox_zoom=5.8,
         mapbox_center_lat=19,
         mapbox_center_lon=-73,
+        showlegend=False,
     )
     return fig
 
