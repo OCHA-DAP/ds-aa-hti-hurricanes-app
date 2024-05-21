@@ -14,7 +14,7 @@ def map_plot_fig(atcf_id: str, issue_time, app):
         (tracks["atcf_id"] == atcf_id)
         & (tracks["issue_time"].astype(str) == issue_time)
     ]
-    issue_time_str = pd.to_datetime(issue_time).strftime("%Hh, %d %b")
+    tracks_f["valid_time_str"] = tracks_f["valid_time"].dt.strftime("%Hh, %d %b")
     fig = go.Figure()
     # adm0 outline
     for geom in adm.geometry[0].geoms:
@@ -69,9 +69,10 @@ def map_plot_fig(atcf_id: str, issue_time, app):
                 mode="markers+text+lines",
                 marker=dict(size=40, color=lt_params["plot_color"]),
                 text=dff["windspeed"].astype(str),
-                name="Prévision normale",
                 line=dict(width=2, color=lt_params["plot_color"]),
                 textfont=dict(size=20, color="white"),
+                customdata=dff["valid_time_str"],
+                hovertemplate=("Heure valide: %{customdata}<extra></extra>"),
             )
         )
 
@@ -98,8 +99,8 @@ def map_plot_fig(atcf_id: str, issue_time, app):
                     mode="text+markers",
                     text=[rain_level_str],
                     marker=dict(size=40, color="blue"),
-                    name=issue_time_str,
                     textfont=dict(size=20, color="white"),
+                    hoverinfo="none",
                 )
             )
 
