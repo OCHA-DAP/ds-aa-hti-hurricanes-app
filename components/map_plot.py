@@ -4,47 +4,12 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc
 
-from src.datasources import codab, nhc
 
-
-def speed2cat(speed):
-    if pd.isnull(speed):
-        return None
-    elif speed <= 33:
-        return "TD"
-    elif speed <= 63:
-        return "TS"
-    elif speed <= 82:
-        return "1"
-    elif speed <= 95:
-        return "2"
-    elif speed <= 112:
-        return "3"
-    elif speed <= 136:
-        return "4"
-    else:
-        return "5"
-
-
-monitors = nhc.load_hist_fcast_monitors()
-tracks = nhc.load_hti_distances()
-tracks["cat"] = tracks["windspeed"].apply(speed2cat)
-tracks["lt"] = tracks["valid_time"] - tracks["issue_time"]
-tracks = tracks.merge(
-    monitors[monitors["lt_name"] == "readiness"], on=["atcf_id", "issue_time"]
-)
-
-lts = {
-    "readiness": pd.Timedelta(days=5),
-    "action": pd.Timedelta(days=3),
-    "obsv": pd.Timedelta(days=0),
-}
-
-adm = codab.load_codab_from_blob(admin_level=0)
-buffer = codab.load_buffer(distance_km=230)
-
-
-def map_plot_fig(atcf_id: str, issue_time):
+def map_plot_fig(atcf_id: str, issue_time, app):
+    adm = app.data["adm"]
+    buffer = app.data["buffer"]
+    tracks = app.data["tracks"]
+    lts = app.data["lts"]
     tracks_f = tracks[
         (tracks["atcf_id"] == atcf_id)
         & (tracks["issue_time"].astype(str) == issue_time)

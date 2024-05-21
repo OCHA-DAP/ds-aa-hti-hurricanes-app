@@ -10,7 +10,7 @@ def register_callbacks(app):
         State("storm-dropdown", "value"),
     )
     def update_map_plot_fig(issue_time, atcf_id):
-        return map_plot_fig(atcf_id, issue_time)
+        return map_plot_fig(atcf_id, issue_time, app)
 
     @app.callback(
         Output("date-dropdown", "options"),

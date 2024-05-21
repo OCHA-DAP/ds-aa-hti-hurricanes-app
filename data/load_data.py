@@ -1,4 +1,6 @@
-from src.datasources import nhc
+import pandas as pd
+
+from src.datasources import codab, nhc
 from src.utils.processing import speed2cat
 
 
@@ -16,4 +18,20 @@ def load_data():
     storms["nameyear"] = storms["name"] + " " + storms["year"].astype(str)
     storms = storms.set_index("atcf_id")
 
-    return {"monitors": monitors, "tracks": tracks, "storms": storms}
+    adm = codab.load_codab_from_blob(admin_level=0)
+    buffer = codab.load_buffer(distance_km=230)
+
+    lts = {
+        "readiness": pd.Timedelta(days=5),
+        "action": pd.Timedelta(days=3),
+        "obsv": pd.Timedelta(days=0),
+    }
+
+    return {
+        "monitors": monitors,
+        "tracks": tracks,
+        "storms": storms,
+        "adm": adm,
+        "buffer": buffer,
+        "lts": lts,
+    }
