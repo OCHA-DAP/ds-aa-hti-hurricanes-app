@@ -49,7 +49,10 @@ def map_plot_fig(atcf_id: str, issue_time, app):
             & (tracks_f["lt"] >= lt_params["lt_min"])
         ]
         # triggered points
-        dff_trig = dff[dff["windspeed"] >= lt_params["threshs"]["wind_dist"]]
+        dff_trig = dff[
+            (dff["windspeed"] >= lt_params["threshs"]["wind_dist"])
+            & (dff["lt"] > lt_params["lt_min"])
+        ]
         fig.add_trace(
             go.Scattermapbox(
                 lon=dff_trig["lon"],

@@ -30,7 +30,7 @@ def load_data():
             "label": "Action",
             "zorder": 2,
             "lt_max": pd.Timedelta(days=3),
-            "lt_min": pd.Timedelta(days=0),
+            "lt_min": pd.Timedelta(days=-1),
             "threshs": {
                 "roll2_rain_dist": 42,
                 "wind_dist": 64,
