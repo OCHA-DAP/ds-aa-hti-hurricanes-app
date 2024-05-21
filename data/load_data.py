@@ -22,9 +22,34 @@ def load_data():
     buffer = codab.load_buffer(distance_km=230)
 
     lts = {
-        "readiness": pd.Timedelta(days=5),
-        "action": pd.Timedelta(days=3),
-        "obsv": pd.Timedelta(days=0),
+        "action": {
+            "color": "darkorange",
+            "plot_color": "black",
+            "dash": "solid",
+            "label": "Action",
+            "zorder": 2,
+            "lt_max": pd.Timedelta(days=3),
+            "lt_min": pd.Timedelta(days=0),
+            "threshs": {
+                "roll2_rain_dist": 42,
+                "wind_dist": 64,
+                "dist_min": 230,
+            },
+        },
+        "readiness": {
+            "color": "dodgerblue",
+            "plot_color": "grey",
+            "dash": "dot",
+            "label": "Mobilisation",
+            "zorder": 1,
+            "lt_max": pd.Timedelta(days=5),
+            "lt_min": pd.Timedelta(days=3),
+            "threshs": {
+                "roll2_rain_dist": 35,
+                "wind_dist": 34,
+                "dist_min": 230,
+            },
+        },
     }
 
     return {

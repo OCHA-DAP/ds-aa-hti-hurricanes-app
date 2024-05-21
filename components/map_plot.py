@@ -16,6 +16,7 @@ def map_plot_fig(atcf_id: str, issue_time, app):
     ]
     issue_time_str = pd.to_datetime(issue_time).strftime("%Hh, %d %b")
     fig = go.Figure()
+    # adm0 outline
     for geom in adm.geometry[0].geoms:
         x, y = geom.exterior.coords.xy
         fig.add_trace(
@@ -23,10 +24,11 @@ def map_plot_fig(atcf_id: str, issue_time, app):
                 lon=list(x),
                 lat=list(y),
                 mode="lines",
-                line_color="red",
+                line_color="grey",
                 showlegend=False,
             )
         )
+    # buffer
     fig.add_trace(
         go.Choroplethmapbox(
             geojson=json.loads(buffer.geometry.to_json()),
@@ -40,44 +42,63 @@ def map_plot_fig(atcf_id: str, issue_time, app):
         )
     )
 
-    dff_a = tracks_f[tracks_f["lt"] <= lts["action"]]
-    dff_r = tracks_f[
-        (tracks_f["lt"] <= lts["readiness"]) & (tracks_f["lt"] >= lts["action"])
-    ]
-    fig.add_trace(
-        go.Scattermapbox(
-            lon=dff_a["lon"],
-            lat=dff_a["lat"],
-            mode="text+lines",
-            text=dff_a["windspeed"].astype(str),
-            name="Prévision normale",
-            line=dict(width=2, color="black"),
-            textfont=dict(size=20, color="black"),
+    for lt_name in ["readiness", "action"]:
+        lt_params = lts[lt_name]
+        dff = tracks_f[
+            (tracks_f["lt"] <= lt_params["lt_max"])
+            & (tracks_f["lt"] >= lt_params["lt_min"])
+        ]
+        # triggered points
+        dff_trig = dff[dff["windspeed"] >= lt_params["threshs"]["wind_dist"]]
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=dff_trig["lon"],
+                lat=dff_trig["lat"],
+                mode="markers",
+                marker=dict(size=50, color="red"),
+            )
         )
-    )
-    fig.add_trace(
-        go.Scattermapbox(
-            lon=dff_r["lon"],
-            lat=dff_r["lat"],
-            mode="text+lines",
-            text=dff_a["windspeed"].astype(str),
-            name="Prévision prolongée",
-            legendgroup=issue_time_str,
-            line=dict(width=2, color="grey"),
-            textfont=dict(size=20, color="grey"),
+        # all points
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=dff["lon"],
+                lat=dff["lat"],
+                mode="markers+text+lines",
+                marker=dict(size=40, color=lt_params["plot_color"]),
+                text=dff["windspeed"].astype(str),
+                name="Prévision normale",
+                line=dict(width=2, color=lt_params["plot_color"]),
+                textfont=dict(size=20, color="white"),
+            )
         )
-    )
-    fig.add_trace(
-        go.Scattermapbox(
-            lon=[-72.3],
-            lat=[19],
-            mode="text",
-            text=[f'{dff_r["roll2_rain_dist"].max():.0f}'],
-            name=issue_time_str,
-            legendgroup=issue_time_str,
-            textfont=dict(size=20, color="blue"),
-        )
-    )
+
+        # rainfall
+        if lt_name == "readiness":
+            rain_level = dff["roll2_rain_dist"].max()
+            if pd.isnull(rain_level):
+                rain_level_str = ""
+            else:
+                rain_level_str = int(rain_level)
+            if rain_level > lt_params["threshs"]["roll2_rain_dist"]:
+                fig.add_trace(
+                    go.Scattermapbox(
+                        lon=[-72.3],
+                        lat=[19],
+                        mode="markers",
+                        marker=dict(size=50, color="red"),
+                    )
+                )
+            fig.add_trace(
+                go.Scattermapbox(
+                    lon=[-72.3],
+                    lat=[19],
+                    mode="text+markers",
+                    text=[rain_level_str],
+                    marker=dict(size=40, color="blue"),
+                    name=issue_time_str,
+                    textfont=dict(size=20, color="white"),
+                )
+            )
 
     fig.update_layout(
         mapbox_style="open-street-map",

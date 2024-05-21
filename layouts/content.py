@@ -13,12 +13,27 @@ def content(app):
                     "position": "fixed",
                     "top": 60,
                     "left": 0,
-                    "width": "100%",
+                    "bottom": 0,
                     "zIndex": 1,
                 },
                 children=[
-                    html.Div(get_storm_dropdown(app), className="m-2"),
-                    html.Div(date_dropdown, className="m-2"),
+                    # top left
+                    html.Div(
+                        style={"position": "absolute", "top": 0, "left": 0},
+                        children=[
+                            html.Div(get_storm_dropdown(app), className="m-2"),
+                            html.Div(date_dropdown, className="m-2"),
+                        ],
+                    ),
+                    # bottom left
+                    html.Div(
+                        style={"position": "absolute", "bottom": 0, "left": 0},
+                        children=[
+                            html.Img(
+                                src="assets/map_legend.png", height=300, className="m-2"
+                            )
+                        ],
+                    ),
                 ],
             ),
             html.Div(
@@ -26,7 +41,8 @@ def content(app):
                     "position": "fixed",
                     "top": 60,
                     "left": 0,
-                    "width": "100%",
+                    "bottom": 0,
+                    "right": 0,
                     "zIndex": 0,
                 },
                 children=dcc.Loading(
