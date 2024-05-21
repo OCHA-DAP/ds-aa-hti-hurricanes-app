@@ -1,6 +1,7 @@
 from dash.dependencies import Input, Output, State
 
 from components.map_plot import map_plot_fig
+from components.time_plot import time_plot_fig
 
 
 def register_callbacks(app):
@@ -23,3 +24,17 @@ def register_callbacks(app):
         return [
             {"label": i.strftime("%Hh, %d %b"), "value": str(i)} for i in issue_times
         ], str(issue_times[0])
+
+    @app.callback(Output("time-plot", "figure"), Input("storm-dropdown", "value"))
+    def update_time_plot_fig(atcf_id):
+        return time_plot_fig(atcf_id, app)
+
+    @app.callback(
+        Output("collapse", "is_open"),
+        [Input("collapse-button", "n_clicks")],
+        [State("collapse", "is_open")],
+    )
+    def toggle_collapse(n, is_open):
+        if n:
+            return not is_open
+        return is_open

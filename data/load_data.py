@@ -1,6 +1,7 @@
 import pandas as pd
 
 from src.datasources import codab, nhc
+from src.utils import blob
 from src.utils.processing import speed2cat
 
 
@@ -52,6 +53,13 @@ def load_data():
         },
     }
 
+    trig_str = (
+        f'triggers_r_p{lts["readiness"]["threshs"]["roll2_rain_dist"]}_s{lts["readiness"]["threshs"]["wind_dist"]}_'
+        f'a_p{lts["action"]["threshs"]["roll2_rain_dist"]}_s{lts["action"]["threshs"]["wind_dist"]}'
+    )
+    blob_name = f"{blob.PROJECT_PREFIX}/processed/{trig_str}.csv"
+    triggers = blob.load_parquet_from_blob(blob_name, prod_dev="dev")
+
     return {
         "monitors": monitors,
         "tracks": tracks,
@@ -59,4 +67,5 @@ def load_data():
         "adm": adm,
         "buffer": buffer,
         "lts": lts,
+        "triggers": triggers,
     }

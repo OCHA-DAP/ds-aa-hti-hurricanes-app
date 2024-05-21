@@ -6,6 +6,7 @@ import zipfile
 from typing import Literal
 
 import geopandas as gpd
+import pandas as pd
 from azure.storage.blob import ContainerClient
 
 PROD_BLOB_SAS = os.getenv("PROD_BLOB_SAS")
@@ -18,9 +19,16 @@ DEV_BLOB_BASE_URL = "https://imb0chd0dev.blob.core.windows.net/"
 DEV_BLOB_PROJ_BASE_URL = DEV_BLOB_BASE_URL + "projects"
 DEV_BLOB_PROJ_URL = DEV_BLOB_PROJ_BASE_URL + "?" + DEV_BLOB_SAS
 
+PROJECT_PREFIX = "ds-aa-hti-hurricanes"
+
 
 prod_container_client = ContainerClient.from_container_url(PROD_BLOB_AA_URL)
 dev_container_client = ContainerClient.from_container_url(DEV_BLOB_PROJ_URL)
+
+
+def load_parquet_from_blob(blob_name, prod_dev: Literal["prod", "dev"] = "prod"):
+    blob_data = load_blob_data(blob_name, prod_dev=prod_dev)
+    return pd.read_parquet(io.BytesIO(blob_data))
 
 
 def upload_gdf_to_blob(gdf, blob_name, prod_dev: Literal["prod", "dev"] = "prod"):

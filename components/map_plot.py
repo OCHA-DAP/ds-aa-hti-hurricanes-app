@@ -113,6 +113,6 @@ def map_plot_fig(atcf_id: str, issue_time, app):
 
 map_plot = dcc.Graph(
     id="map-plot",
-    style={"height": "100vh", "background-color": "#f8f9fc"},
+    style={"height": "100vh"},
     config={"displayModeBar": False},
 )
