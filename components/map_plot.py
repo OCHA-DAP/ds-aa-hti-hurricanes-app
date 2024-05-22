@@ -13,7 +13,7 @@ def map_plot_fig(atcf_id: str, issue_time, app):
     tracks_f = tracks[
         (tracks["atcf_id"] == atcf_id)
         & (tracks["issue_time"].astype(str) == issue_time)
-    ]
+    ].copy()
     tracks_f["valid_time_str"] = tracks_f["valid_time"].dt.strftime("%Hh, %d %b")
     fig = go.Figure()
     # adm0 outline
