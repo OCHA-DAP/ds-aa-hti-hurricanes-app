@@ -26,12 +26,12 @@ prod_container_client = ContainerClient.from_container_url(PROD_BLOB_AA_URL)
 dev_container_client = ContainerClient.from_container_url(DEV_BLOB_PROJ_URL)
 
 
-def load_parquet_from_blob(blob_name, prod_dev: Literal["prod", "dev"] = "prod"):
+def load_parquet_from_blob(blob_name, prod_dev: Literal["prod", "dev"] = "dev"):
     blob_data = load_blob_data(blob_name, prod_dev=prod_dev)
     return pd.read_parquet(io.BytesIO(blob_data))
 
 
-def upload_gdf_to_blob(gdf, blob_name, prod_dev: Literal["prod", "dev"] = "prod"):
+def upload_gdf_to_blob(gdf, blob_name, prod_dev: Literal["prod", "dev"] = "dev"):
     with tempfile.TemporaryDirectory() as temp_dir:
         # File paths for shapefile components within the temp directory
         shp_base_path = os.path.join(temp_dir, "data")
@@ -51,7 +51,7 @@ def upload_gdf_to_blob(gdf, blob_name, prod_dev: Literal["prod", "dev"] = "prod"
 
 
 def load_gdf_from_blob(
-    blob_name, shapefile: str = None, prod_dev: Literal["prod", "dev"] = "prod"
+    blob_name, shapefile: str = None, prod_dev: Literal["prod", "dev"] = "dev"
 ):
     blob_data = load_blob_data(blob_name, prod_dev=prod_dev)
     with zipfile.ZipFile(io.BytesIO(blob_data), "r") as zip_ref:
@@ -62,7 +62,7 @@ def load_gdf_from_blob(
     return gdf
 
 
-def load_blob_data(blob_name, prod_dev: Literal["prod", "dev"] = "prod"):
+def load_blob_data(blob_name, prod_dev: Literal["prod", "dev"] = "dev"):
     if prod_dev == "dev":
         container_client = dev_container_client
     else:
@@ -72,7 +72,7 @@ def load_blob_data(blob_name, prod_dev: Literal["prod", "dev"] = "prod"):
     return data
 
 
-def upload_blob_data(blob_name, data, prod_dev: Literal["prod", "dev"] = "prod"):
+def upload_blob_data(blob_name, data, prod_dev: Literal["prod", "dev"] = "dev"):
     if prod_dev == "dev":
         container_client = dev_container_client
     else:
@@ -82,7 +82,7 @@ def upload_blob_data(blob_name, data, prod_dev: Literal["prod", "dev"] = "prod")
 
 
 def list_container_blobs(
-    name_starts_with=None, prod_dev: Literal["prod", "dev"] = "prod"
+    name_starts_with=None, prod_dev: Literal["prod", "dev"] = "dev"
 ):
     if prod_dev == "dev":
         container_client = dev_container_client
