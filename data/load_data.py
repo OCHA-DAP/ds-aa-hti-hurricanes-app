@@ -1,8 +1,15 @@
+import numpy as np
 import pandas as pd
 
 from src.datasources import codab, nhc
 from src.utils import blob
 from src.utils.processing import speed2cat
+
+
+def parse_timedelta(x):
+    if pd.isnull(x):
+        return np.nan
+    return pd.to_timedelta(x)
 
 
 def load_data():
@@ -58,7 +65,12 @@ def load_data():
         f'a_p{lts["action"]["threshs"]["roll2_rain_dist"]}_s{lts["action"]["threshs"]["wind_dist"]}'
     )
     blob_name = f"{blob.PROJECT_PREFIX}/processed/{trig_str}.csv"
-    triggers = blob.load_parquet_from_blob(blob_name, prod_dev="dev")
+    triggers = blob.load_csv_from_blob(
+        blob_name,
+        prod_dev="dev",
+        parse_dates=["action", "readiness", "closest_time"],
+        converters={"readiness_lt": parse_timedelta, "action_lt": parse_timedelta},
+    )
 
     return {
         "monitors": monitors,
